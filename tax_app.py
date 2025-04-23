@@ -1,6 +1,7 @@
+
 import streamlit as st
-import re
-from federal_tax_calculator import compute_tax
+from decimal import Decimal, InvalidOperation
+from federal_tax_calculator import compute_tax_decimal
 
 st.set_page_config(page_title="Federal Tax Calculator")
 
@@ -17,17 +18,13 @@ status = st.selectbox("Select Filing Status", [
 
 income_input = st.text_input("Enter Taxable Income ($)", value="")
 
-match = re.match(r"^\$?\s*([0-9\.,]+)$", income_input)
-
-if match:
-    try:
-        income_clean = income_input.replace(",", "")
-        income = float(income_clean)
-        if st.button("Calculate"):
-            tax, after = compute_tax(income, status, year)
-            st.success(f"Estimated Federal Tax Owed: ${tax:,.2f}")
-            st.info(f"After-Tax Income: ${after:,.2f}")
-    except:
+try:
+    income_clean = income_input.replace(",", "")
+    income = Decimal(income_clean)
+    if st.button("Calculate"):
+        tax, after = compute_tax_decimal(income, status, year)
+        st.success(f"Estimated Federal Tax Owed: ${tax:,.2f}")
+        st.info(f"After-Tax Income: ${after:,.2f}")
+except (InvalidOperation, ValueError):
+    if income_input:
         st.error("⚠️ Please enter a valid number (e.g., 60,000.55)")
-elif income_input:
-    st.error("⚠️ Please enter a valid number (e.g., 60,000.55)")
