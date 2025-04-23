@@ -1,5 +1,5 @@
-
 import streamlit as st
+import re
 from federal_tax_calculator import compute_tax
 
 st.set_page_config(page_title="Federal Tax Calculator")
@@ -14,9 +14,20 @@ status = st.selectbox("Select Filing Status", [
     "Married Filing Separately", 
     "Head of Household"
 ])
-income = st.number_input("Enter Taxable Income ($)", min_value=0, step=1000)
 
-if st.button("Calculate"):
-    tax, after = compute_tax(income, status, year)
-    st.success(f"Estimated Federal Tax Owed: ${tax:,.2f}")
-    st.info(f"After-Tax Income: ${after:,.2f}")
+income_input = st.text_input("Enter Taxable Income ($)", value="")
+
+match = re.match(r"^\$?\s*([0-9\.,]+)$", income_input)
+
+if match:
+    try:
+        income_clean = income_input.replace(",", "")
+        income = float(income_clean)
+        if st.button("Calculate"):
+            tax, after = compute_tax(income, status, year)
+            st.success(f"Estimated Federal Tax Owed: ${tax:,.2f}")
+            st.info(f"After-Tax Income: ${after:,.2f}")
+    except:
+        st.error("⚠️ Please enter a valid number (e.g., 60,000.55)")
+elif income_input:
+    st.error("⚠️ Please enter a valid number (e.g., 60,000.55)")
