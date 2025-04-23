@@ -18,5 +18,5 @@ income = st.number_input("Enter Taxable Income ($)", min_value=0, step=1000)
 
 if st.button("Calculate"):
     tax, after = compute_tax(income, status, year)
-    st.success(f"Estimated Federal Tax Owed: ${tax:.2f}")
-    st.info(f"After-Tax Income: ${after:.2f}")
+    st.success(f"Estimated Federal Tax Owed: ${tax:,.2f}")
+    st.info(f"After-Tax Income: ${after:,.2f}")
